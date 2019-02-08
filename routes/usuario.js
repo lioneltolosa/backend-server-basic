@@ -1,5 +1,8 @@
 var express = require('express');
 var bcrypt = require('bcryptjs');
+var jwt = require('jsonwebtoken');
+
+var SEED = require('../config/config').SEED;
 
 // var jwt = require('jsonwebtoken');
 
@@ -46,6 +49,24 @@ app.get('/', (req, res, next) => {
         });
     });
 
+
+
+    // Verificar Token
+
+    app.use('/', (req, res, next) => {
+        var token = req.query.err
+
+        jwt.verify ( token, SEED, (err, decode) => {
+            if (err) {
+                return res.status(401).json({  // 500 Internal Server Error
+                    ok: false,
+                    mensaje: 'Token no valido',
+                    errors: err
+                });
+            }
+            next();
+        });
+    });
 
 
 
