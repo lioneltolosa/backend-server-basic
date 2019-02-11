@@ -4,16 +4,15 @@ var jwt = require('jsonwebtoken');
 
 var SEED = require('../config/config').SEED;
 
-// var jwt = require('jsonwebtoken');
-
 // var mdAutenticacion = require('../middlewares/autenticacion');
 
 // Inicializar variables
 var app = express();
-
 var Usuario = require('../models/usuario');
 
-// // Routes (THIS CODE SHOW ALL)
+// Routes (THIS CODE SHOW ALL)
+
+// GET OBTENER USUARIO
 // app.get('/', (req, res, next) => {
 //     Usuario.find( {}, (err, usuarios) => {
 //         if( err ) {
@@ -31,143 +30,133 @@ var Usuario = require('../models/usuario');
 // });
 
 // // Routes  ( THIS CODE SHOW ONLY 'name email img role' AND NEXT EXEC)
+
+// GET USER
 app.get('/', (req, res, next) => {
-    Usuario.find( {}, 'name email img role')
-    .exec ( 
-        (err, usuarios) => {
-            if( err ) {
-                return  res.status(500).json({
-                    ok: true,
-                    mensaje: 'Error cargando usuarios',
-                    errors: err
-                });
-            } 
-            res.status(200).json({
-                ok: true,
-                usuarios: usuarios
-            });
-        });
-    });
-
-
-
-    // Verificar Token
-
-    app.use('/', (req, res, next) => {
-        var token = req.query.err
-
-        jwt.verify ( token, SEED, (err, decode) => {
-            if (err) {
-                return res.status(401).json({  // 500 Internal Server Error
-                    ok: false,
-                    mensaje: 'Token no valido',
-                    errors: err
-                });
-            }
-            next();
-        });
-    });
-
-
-
-    // PUt Actualizar usuario
-    app.put('/:id', (req, res) => {
-
-        var id = req.params.id
-        var body = req.body;
-
-        Usuario.findById( id, (err, usuario) => {
-
-            if (err) {
-                return res.status(500).json({  // 500 Internal Server Error
-                    ok: false,
-                    mensaje: 'Error al buscar usuario',
-                    errors: err
-                });
-            }
-
-            if( !usuario) {
-                return res.status(400).json ({
-                    ok: false,
-                    mensaje: 'El usuario con el' + id + 'no existe',
-                    errors: {mensaje: 'No existe un usuraio con ese ID'}
-                })
-            }
-
-            usuario.name = body.name;
-            usuario.email = body.email;
-            usuario.role = body.role;
-
-            usuario.save((err, usuarioGuardado) => {
-    
+    Usuario.find({}, 'name email img role')
+        .exec(
+            (err, usuarios) => {
                 if (err) {
-                    return res.status(400).json({
-                        ok: false,
-                        mensaje: 'Error al actualizar usuario',
+                    return res.status(500).json({
+                        ok: true,
+                        mensaje: 'Error cargando usuarios',
                         errors: err
                     });
                 }
-
-                usuarioGuardado.password = ':)';
-        
-                res.status(200).json({ 
+                res.status(200).json({
                     ok: true,
-                    usuario: usuarioGuardado,
+                    usuarios: usuarios
                 });
             });
         });
+
+
+
+// CHECK TOKEN
+app.use('/', (req, res, next) => {
+    var token = req.query.err
+
+    jwt.verify(token, SEED, (err, decode) => {
+        if (err) {
+            return res.status(401).json({  // 500 Internal Server Error
+                ok: false,
+                mensaje: 'Token no valido',
+                errors: err
+            });
+        }
+        next();
     });
+});
 
 
 
+// PUt USER
+app.put('/:id', (req, res) => {
 
+    var id = req.params.id
+    var body = req.body;
 
+    Usuario.findById(id, (err, usuario) => {
 
+        if (err) {
+            return res.status(500).json({  // 500 Internal Server Error
+                ok: false,
+                mensaje: 'Error al buscar usuario',
+                errors: err
+            });
+        }
 
+        if (!usuario) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El usuario con el' + id + 'no existe',
+                errors: { mensaje: 'No existe un usuraio con ese ID' }
+            })
+        }
 
+        usuario.name = body.name;
+        usuario.email = body.email;
+        usuario.role = body.role;
 
-    // Post   Crear nuevo usuario
-
-    app.post('/', (req, res) => {
-
-        var body = req.body;
-    
-        var usuario = new Usuario({
-            nombre: body.nombre,
-            email: body.email,
-            password: bcrypt.hashSync(body.password, 10),
-            img: body.img,
-            role: body.role
-        });
-    
         usuario.save((err, usuarioGuardado) => {
-    
+
             if (err) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'Error al crear usuario',
+                    mensaje: 'Error al actualizar usuario',
                     errors: err
                 });
             }
-    
-            res.status(201).json({   // 201 USUARIO CREADO
+
+            usuarioGuardado.password = ':)';
+
+            res.status(200).json({
                 ok: true,
-                // body: body
                 usuario: usuarioGuardado,
-                // usuariotoken: req.usuario
             });
         });
     });
+});
+
+// POST USER 
+app.post('/', (req, res) => {
+
+    var body = req.body;
+
+    var usuario = new Usuario({
+        nombre: body.nombre,
+        email: body.email,
+        password: bcrypt.hashSync(body.password, 10),
+        img: body.img,
+        role: body.role
+    });
+
+    usuario.save((err, usuarioGuardado) => {
+
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Error al crear usuario',
+                errors: err
+            });
+        }
+
+        res.status(201).json({   // 201 USUARIO CREADO
+            ok: true,
+            // body: body
+            usuario: usuarioGuardado,
+            // usuariotoken: req.usuario
+        });
+    });
+});
 
 
 
 
-//   Borrar un usuario por el id
+// DELETE USER FOR ID
 
-// app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+// DELETE USER 
 app.delete('/:id', (req, res) => {
-
-
     var id = req.params.id;
 
     Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {

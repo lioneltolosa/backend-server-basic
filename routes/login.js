@@ -37,7 +37,7 @@ app.post('/', (req, res) => {
             });
         }
 
-        // Crear un Token!!
+        // CREATE TOKEN!!
 
         usuarioDB.password = ':)';
 
@@ -51,11 +51,6 @@ app.post('/', (req, res) => {
         });
     })
 
-
 });
-
-
-
-
 
 module.exports = app;
