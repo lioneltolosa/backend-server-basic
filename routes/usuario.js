@@ -4,7 +4,7 @@ var jwt = require('jsonwebtoken');
 
 var SEED = require('../config/config').SEED;
 
-// var mdAutenticacion = require('../middlewares/autenticacion');
+var mdAutenticacion = require('../middlewares/autentication');
 
 // Inicializar variables
 var app = express();
@@ -50,28 +50,8 @@ app.get('/', (req, res, next) => {
             });
         });
 
-
-
-// CHECK TOKEN
-app.use('/', (req, res, next) => {
-    var token = req.query.err
-
-    jwt.verify(token, SEED, (err, decode) => {
-        if (err) {
-            return res.status(401).json({  // 500 Internal Server Error
-                ok: false,
-                mensaje: 'Token no valido',
-                errors: err
-            });
-        }
-        next();
-    });
-});
-
-
-
 // PUt USER
-app.put('/:id', (req, res) => {
+app.put('/:id', mdAutenticacion.verificationToken, (req, res) => {
 
     var id = req.params.id
     var body = req.body;
@@ -119,7 +99,7 @@ app.put('/:id', (req, res) => {
 });
 
 // POST USER 
-app.post('/', (req, res) => {
+app.post('/', mdAutenticacion.verificationToken, (req, res) => {
 
     var body = req.body;
 
@@ -143,9 +123,8 @@ app.post('/', (req, res) => {
 
         res.status(201).json({   // 201 USUARIO CREADO
             ok: true,
-            // body: body
             usuario: usuarioGuardado,
-            // usuariotoken: req.usuario
+            usuariotoken: req.usuario
         });
     });
 });
@@ -156,7 +135,7 @@ app.post('/', (req, res) => {
 // DELETE USER FOR ID
 
 // DELETE USER 
-app.delete('/:id', (req, res) => {
+app.delete('/:id', mdAutenticacion.verificationToken, (req, res) => {
     var id = req.params.id;
 
     Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
