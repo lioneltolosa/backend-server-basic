@@ -99,7 +99,7 @@ app.put('/:id', mdAutenticacion.verificationToken, (req, res) => {
 });
 
 // POST USER 
-app.post('/', mdAutenticacion.verificationToken, (req, res) => {
+app.post('/', (req, res) => {
 
     var body = req.body;
 
@@ -128,9 +128,6 @@ app.post('/', mdAutenticacion.verificationToken, (req, res) => {
         });
     });
 });
-
-
-
 
 // DELETE USER FOR ID
 
