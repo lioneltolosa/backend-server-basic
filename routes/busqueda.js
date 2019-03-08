@@ -7,6 +7,54 @@ var Hospital = require('../models/hospital');
 var Medico = require('../models/medico');
 var Usuario = require('../models/usuario');
 
+
+// ==============================
+// Busqueda por colección
+// ==============================
+
+app.get('/coleccion/:tabla/:busqueda' , (req, res) => {
+
+    var busqueda = req.params.busqueda;
+    var tabla = req.params.tabla;
+    var regex = new RegExp (busqueda, 'i');
+
+    var prosesa;
+
+    switch(tabla) {
+        case 'usuarios':
+            promesa = buscarUsuarios(busqueda, regex);
+            break;
+        case 'medicos':
+            promesa = buscarMedicos(busqueda, regex);
+            break;
+        case 'hospitales':
+            promesa = buscarHospitales(busqueda, regex);
+            break;
+
+        default:
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Los tipos de busqueda sólo son: usuarios, medicos y hospitales',
+                error: { message: 'Tipo de tabla/coleccion no válido' }
+            })
+    }   
+
+    promesa.then(data => {
+
+        res.status(200).json({
+            ok: true,
+            [tabla]: data
+        });
+
+    })
+
+});
+
+
+// ==============================
+// Busqueda general
+// ==============================
+
 // Routes
 app.get('/todo/:busqueda', (req, res, next) => {
     
@@ -25,13 +73,6 @@ app.get('/todo/:busqueda', (req, res, next) => {
                 usuarios: respuestas[2]
             });
         })
-
-
-    // buscarHospitales( busqueda, regex)
-    // .then( hospitales => {
-
-       
-    // }); 
 });
 
 function buscarHospitales(busqueda, regex) {
@@ -86,45 +127,3 @@ function buscarUsuarios(busqueda, regex) {
 }
 
 module.exports = app;
-
-
-
-// var express = require('express');
-
-// // Inicializar variables
-// var app = express();
-
-// var Hospital = require('../models/hospital');
-// var Medico = require('../models/medico');
-
-// // Routes
-// app.get('/todo/:busqueda', (req, res, next) => {
-    
-//     var busqueda = req.params.busqueda;
-//     var regex = new RegExp (busqueda, 'i');
-
-    // buscarHospitales( busqueda, regex)
-    //     .then( hospitales => {
-    //         res.status(200).json({
-    //             ok: true,
-    //             hospitales: hospitales
-    //         });
-    //     });        
-// });
-
-// function buscarHospitales(busqueda, regex) {
-
-//     return new Promise ( (resolve, reject) => {
-
-//         Hospital.find({ name: regex }, (err, hospitales) => {
-            
-//             if( err ) {
-//                 reject('Error al cargar hospitales', err);
-//             } else {
-//                 resolve(hospitales)
-//             }
-//         })
-//     })
-// }
-
-// module.exports = app;
