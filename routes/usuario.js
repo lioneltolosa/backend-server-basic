@@ -29,7 +29,7 @@ var Usuario = require('../models/usuario');
 //     });
 // });
 
-// // Routes  ( THIS CODE SHOW ONLY 'name email img role' AND NEXT EXEC)
+// // Routes  ( THIS CODE SHOW ONLY 'nombre email img role' AND NEXT EXEC)
 
 // GET USER
 app.get('/', (req, res, next) => {
@@ -37,7 +37,7 @@ app.get('/', (req, res, next) => {
     var desde = req.query.desde || 0;
     desde =  Number(desde);
 
-    Usuario.find({}, 'name email img role')
+    Usuario.find({}, 'nombre email img role')
         .skip(desde)
         .limit(5)
         .exec(
@@ -84,7 +84,7 @@ app.put('/:id', mdAutenticacion.verificationToken, (req, res) => {
             })
         }
 
-        usuario.name = body.name;
+        usuario.nombre = body.nombre;
         usuario.email = body.email;
         usuario.role = body.role;
 
@@ -114,7 +114,7 @@ app.post('/', (req, res) => {
     var body = req.body;
 
     var usuario = new Usuario({
-        name: body.name,
+        nombre: body.nombre,
         email: body.email,
         password: bcrypt.hashSync(body.password, 10),
         img: body.img,

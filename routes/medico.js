@@ -12,12 +12,11 @@ app.get('/', (req, res, next) => {
     desde =  Number(desde);
 
     Medico.find({})
-    .skip(desde)
+        .skip(desde)
         .limit(5)
         .populate('usuario', 'nombre email')
         .populate('hospital')
-        .exec(
-            (err, medicos) => {
+        .exec( (err, medicos) => {
 
                 if (err) {
                     return res.status(500).json({
@@ -61,7 +60,7 @@ app.put('/:id', mdAutenticacion.verificationToken, (req, res) => {
             })
         }
 
-        medico.name = body.name;
+        medico.nombre = body.nombre;
         medico.usuario = req.usuario;
         medico.hospital = body.hospital;
 
@@ -84,11 +83,12 @@ app.put('/:id', mdAutenticacion.verificationToken, (req, res) => {
 });
 
 app.post('/', mdAutenticacion.verificationToken, (req, res) => {
+// app.post('/', (req, res) => {
 
     var body = req.body;
 
     var medico = new Medico({
-        name: body.name,
+        nombre: body.nombre,
         usuario: req.usuario,
         hospital: body.hospital
     });

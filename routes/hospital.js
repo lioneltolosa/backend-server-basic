@@ -14,7 +14,7 @@ app.get('/', (req, res, next) => {
     Hospital.find({})
         .skip(desde)
         .limit(5)
-        .populate('usuario', 'name email')
+        .populate('usuario', 'nombre email')
         .exec(
             (err, hospitales) => {
 
@@ -61,7 +61,7 @@ app.put('/:id', mdAutenticacion.verificationToken, (req, res) => {
             })
         }
 
-        hospital.name = body.name;
+        hospital.nombre = body.nombre;
 
         hospital.save((err, hospitalGuardado) => {
 
@@ -84,11 +84,12 @@ app.put('/:id', mdAutenticacion.verificationToken, (req, res) => {
 });
 
 app.post('/', mdAutenticacion.verificationToken, (req, res) => {
+// app.post('/', (req, res) => {
 
     var body = req.body;
 
     var hospital = new Hospital({
-        name: body.name,
+        nombre: body.nombre,
         usuario: body.id
     });
 
